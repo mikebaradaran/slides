@@ -1,0 +1,2783 @@
+~AjaxDemo.html
+<html lang="en">
+<head>
+    <title>QA</title>
+</head>
+<body>
+    <div id='tbl'></div>
+    <script>
+        const url = 'https://wsnorthwind.herokuapp.com/customers';
+
+        fetch(url)
+            .then(function (response) {
+                return response.json();
+            }).then(function (data) {
+                display(data);
+            }).catch(function (error) {
+                alert(error);
+            });
+
+        function display(data) {
+            let count = 1;
+            let tbl = '<table border=1>';
+            data.forEach(x => {
+                tbl += `<tr>
+                                <td>${count++}</td>
+                                <td>${x.CustomerID}</td>
+                                <td>${x.ContactName}</td>
+                                <td>${x.City}</td>
+                            </tr>`;
+            });
+            tbl += '</table>';
+            document.getElementById('tbl').innerHTML = tbl;
+        }
+    </script>
+</body>
+</html>
+
+~angularCustomers.html
+<html>
+
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.js"></script>
+    <script>
+        angular.module('app1', [])
+            .controller('controller1', function ($scope, $http) {
+                $scope.pageSize = 15;
+                $scope.skipBy = 0;
+                $scope.sortBy = 'City';
+                $scope.hideID = false;
+
+                $http({
+                    method: "Get", url: 'https://wsnorthwind.herokuapp.com/customers'
+                }).then(function (response) {
+                    $scope.customers = response.data;
+                });
+
+                $scope.sortByColumnName = function (s) {
+                    $scope.sortBy = s;
+                }
+
+                $scope.pgUpDownClick = function (upOrDown) {
+                    rows = $scope.pageSize * upOrDown;
+                    $scope.skipBy += rows;
+                    if ($scope.skipBy > $scope.customers.length)
+                        $scope.skipBy -= rows;
+                }
+            });
+    </script>
+</head>
+
+<body ng-app="app1" ng-controller="controller1">
+    Sort by:
+    <select ng-model="sortBy">
+        <option value="ContactName">Name</option>
+        <option value="CompanyName">Company</option>
+        <option value="Country">Country</option>
+        <option value="City">City</option>
+    </select>
+
+    Hide data: <input type="checkbox" ng-model="hideID" />
+
+    <table border="1">
+        <tr>
+            <th ng-click="sortByColumnName('CustomerID')"  ng-hide='hideID'>Name</th>
+            <th ng-click="sortByColumnName('ContactName')">Name</th>
+            <th ng-click="sortByColumnName('CompanyName')">Company</th>
+            <th ng-click="sortByColumnName('Country')">Country</th>
+            <th ng-click="sortByColumnName('City')">City</th>
+        </tr>
+        <tr ng-repeat="cus in customers | orderBy:sortBy | limitTo:pageSize : skipBy ">
+            <td ng-hide='hideID'>{{cus.CustomerID}}</td>
+            <td>{{cus.ContactName}}</td>
+            <td>{{cus.CompanyName}}</td>
+            <td>{{cus.Country}}</td>
+            <td>{{cus.City}}</td>
+        </tr>
+    </table>
+    <button ng-click="pgUpDownClick(+1)">page Down</button>
+    <button ng-click="pgUpDownClick(-1)">page Up</button>
+</body>
+
+</html>
+
+~animation.html
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <style>
+        @keyframes animation1 {
+            from {
+                transform: rotate(-10deg);
+            }
+
+            to {
+                transform: rotate(10deg);
+            }
+        }
+
+        @keyframes animation2 {
+            from {
+                transform: scale(1);
+            }
+
+            to {
+                transform: scale(1.5);
+                opacity: 1;
+            }
+        }
+
+        #image1 {
+            animation-name: animation1;
+            animation-duration: 1s;
+            animation-iteration-count: infinite;
+            animation-direction: alternate;
+            animation-timing-function: ease-in-out;
+            z-index: 2;
+        }
+
+        #image2 {
+            opacity: 0.5;
+            z-index: 1;
+        }
+
+        #image2:hover {
+            animation-name: animation2;
+            animation-duration: 0.5s;
+            animation-fill-mode: forwards;
+        }
+
+        img {
+            border: 1px solid black;
+            margin-left: auto;
+            margin-right: auto;
+            display: block;
+            position: relative;
+            width:400px;
+        }
+
+    </style>
+</head>
+<body>
+    <h1>CSS animations demo</h1>
+    <img id="image1" src="team.jpg" />
+    <br /> <br />
+    <img id="image2" src="team.jpg" />
+</body>
+</html>
+
+~blockInline.html
+
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        img {
+            width: 100px;
+            float: left;
+        }
+
+        span {
+            border: 2px solid red;
+        }
+    </style>
+    <script>
+        function display(style) {
+            let ctls = document.getElementsByTagName('span');
+            var css = {
+                width: '100px',
+                padding: '5px',
+                border: '2px dashed red'
+            };
+            css.display = style;
+            Object.assign(ctls[0].style, css);
+            Object.assign(ctls[1].style, css);
+            displayCss(css);
+        }
+        function displayCss(css) {
+            css = JSON.stringify(css).replaceAll(',', ',<br />&nbsp;&nbsp;&nbsp;').replace('{', '{<br />&nbsp;&nbsp;&nbsp;').replace('}', '<br />}');
+            document.getElementById("divCss").innerHTML = css;
+        }
+    </script>
+</head>
+<body>
+    <div>This a div with a couple of spans <span>span a</span> <span>span b</span>. Spans are inline elements</div>
+    <p>
+        <button onclick="display('inline-block')">Make spans into inline_block</button>
+        <button onclick="display('block')">Make spans into block elements</button>
+    </p>
+    <h1>Float demo</h1>
+    <img src="team.jpg" alt="QA team's picture"/>
+    <p>
+        <strong>
+            This paragraph text should be at the side of the image, then wrap underneath it
+            when it gets that far
+        </strong>--- Blah, blah, blah, blah, blah, blah, blah, blah, blah, blah,
+        blah, blah, blah, blah, blah, blah, blah, blah, blah, blah, blah, blah, blah, blah,
+        blah, blah, blah, blah, blah, blah, blah, blah, blah, blah, blah, blah, blah, blah,
+        blah, blah, blah, blah, blah, blah, blah, blah, blah, blah, blah, blah, blah, blah,
+    </p>
+    <div id="divCss">
+    </div>
+    <p><a href="tabsInlineBlock.html">tabsInlineBlock.html</a></p>
+</body>
+</html>
+
+~camera.html
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Webcam</title>
+</head>
+
+<body>
+    <video autoplay id="video1"></video>
+    <script>
+        var video = document.querySelector("#video1");
+
+        const constraints = { video: true };
+
+        navigator.mediaDevices.getUserMedia(constraints)
+            .then(function (stream) {
+                video.srcObject = stream;
+            })
+            .catch(function (err) {
+                alert(err);
+            });
+
+        function stop() {
+            var stream = video.srcObject;
+            var tracks = stream.getTracks();
+
+            for (var i = 0; i < tracks.length; i++) {
+                var track = tracks[i];
+                track.stop();
+            }
+            video.srcObject = null;
+        }
+    </script>
+</body>
+</html>
+
+~canvas.html
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        canvas {
+            background-color: lightblue;
+        }
+    </style>
+    <script>
+        function getContext() {
+            var canvas = document.getElementById("myCanvas");
+            return canvas.getContext("2d");
+        }
+        function draw() {
+            var context = getContext();
+
+            context.strokeStyle = 'gray';
+            for (let r = 30; r < 100; r += 5) {
+                context.beginPath();
+                context.arc(100, 100, r, 0, 2 * Math.PI);
+                context.stroke();
+            }
+            context.fillStyle = 'black';
+            context.strokeStyle = 'black';
+            context.font = "30px Verdana";
+            context.strokeText("Hello!", 20, 150);
+
+            context.fillStyle = 'green';
+            context.fillRect(100, 100, 50, 25);
+            context.lineWidth = 2;
+            context.beginPath();
+            context.moveTo(10, 10);
+            context.lineTo(150, 20);
+            context.stroke();
+            drawShapes();
+        }
+
+        drawShapes();
+
+        function clearDrawing() {
+            var canvasElement = document.getElementById("myCanvas");
+            var ctx = canvasElement.getContext("2d");
+            ctx.clearRect(0, 0, 200, 200);
+        }
+
+        function drawShapes() {
+            var ctx = getContext();
+            ctx.strokeStyle = "red";
+            ctx.fillStyle = "pink";
+            ctx.lineWidth = 4;
+
+            ctx.strokeRect(10, 20, 30, 40);
+
+            ctx.fillRect(50, 20, 30, 40);
+            ctx.strokeRect(50, 20, 30, 40);
+
+            ctx.fillRect(90, 20, 30, 40);
+
+            ctx.beginPath();
+            ctx.arc(25, 100, 15, 0, 2 * Math.PI);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.arc(65, 100, 15, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.arc(105, 100, 15, 0, 2 * Math.PI);
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.moveTo(145, 100);
+            ctx.lineTo(130, 100);
+            ctx.arc(145, 100, 15, 1.0 * Math.PI, 0.5 * Math.PI);
+            ctx.lineTo(145, 100);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(10, 180);
+            ctx.lineTo(40, 180);
+            ctx.lineTo(25, 140);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = "black";
+            ctx.font = "30px Tahoma";
+            ctx.fillText("Tada!", 100, 170);
+        }
+
+
+        function clearDrawing() {
+            getContext().clearRect(0, 0, 200, 200);
+        }
+    </script>
+</head>
+<body>
+    <h1>Canvas demo</h1>
+    <canvas id="myCanvas" width="200px" height="200px"></canvas>
+    <button onclick="draw()">Draw</button>
+    <button onclick="clearDrawing()">Clear</button>
+</body>
+</html>
+
+~cssByState.html
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        :checked {
+            height: 2em;
+            width: 2em;
+        }
+
+        :disabled {
+            border: 2px solid gray;
+            box-shadow: 2px 2px 2px;
+        }
+
+        :enabled {
+            border: 2px solid blue;
+        }
+
+        :focus {
+            border: 3px dashed green;
+            background-color: antiquewhite;
+        }
+    </style>
+</head>
+<body>
+    Name <input type="text" /><br />
+    City <input type="text" /><br />
+    Registered: <input type="checkbox" value="reg" /><br />
+    <button disabled>Save</button>
+</body>
+</html>
+
+~demo.html
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <style>
+        #codeText {
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            font-weight: bold;
+            background-image: url("paper.jpg");
+        }
+
+        .content, #codeContainer {
+            width: 50%;
+            float: left;
+            height: 97vh;
+        }
+    </style>
+</head>
+<body>
+    <object class="content" type="text/html" id="webPage"></object>
+    <div id="codeContainer">
+        <textarea id="codeText" onresize="alert('x')" spellcheck="false"></textarea>
+    </div>
+    <script>
+        document.onkeydown = checkKey;
+        let codeContainer = document.getElementById('codeContainer');
+        let code = document.getElementById("codeText");
+        let webPage = document.getElementById("webPage");
+        let wPercent = 0;
+        let fontSize = 12;
+
+        function checkKey(e) {
+            e = e || window.event;
+            if (!e.ctrlKey)
+                return
+
+            if (e.keyCode == '37') {
+                wPercent += 5;
+                codeContainer.style.width = 50 + wPercent + "%";
+                webPage.style.width = 50 - wPercent + "%";
+            }
+            else if (e.keyCode == '39') {
+                wPercent -= 5;
+                codeContainer.style.width = 50 + wPercent + "%";
+                webPage.style.width = 50 - wPercent + "%";
+            }
+            else if (e.keyCode == '38') {   // up
+                code.style.fontSize = ++fontSize + "px";
+            }
+            else if (e.keyCode == '40') {   // down
+                code.style.fontSize = --fontSize + "px";
+            }
+        }
+
+        webPage.data = getPageName();
+
+        fetch(getPageName())
+            .then(response => response.text())
+            .then(
+                text => {
+                    code.innerHTML = getCleanCode(text);
+                })
+
+        function getPageName() {
+            const urlSearchParams = new URLSearchParams(window.location.search);
+            const params = Object.fromEntries(urlSearchParams.entries());
+            return params['page'];
+        }
+
+        function getCleanCode(text) {
+            let end = text.indexOf("</html>") + 7;
+            let html = text.substring(0, end);
+            return html;
+        }
+    </script>
+</body>
+</html>
+
+~demoOLD.html
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <style>
+        #codeText {
+            width: 100%;
+            height: 97vh;
+            overflow: auto;
+            font-weight: bold;
+            background-image: url("paper.jpg");
+        }
+
+        .content, .code {
+            width: 50%;
+            float: left;
+        }
+
+        object {
+            width: 100%;
+            height: 35em;
+        }
+    </style>
+</head>
+<body>
+    <div class="content">
+        <object type="text/html" id="webPage"></object>
+    </div>
+    <div class="code"><textarea id="codeText" spellcheck="false"></textarea></div>
+
+    <script>
+        let code = document.getElementById("codeText");
+        let webPage = document.getElementById("webPage");
+        webPage.data = getPageName();
+
+        fetch(getPageName())
+            .then(response => response.text())
+            .then(
+                text => {
+                    code.innerHTML = getCleanCode(text);
+                })
+
+        function getPageName() {
+            const urlSearchParams = new URLSearchParams(window.location.search);
+            const params = Object.fromEntries(urlSearchParams.entries());
+            return params['page'];
+        }
+
+        function getCleanCode(text) {
+            let end = text.indexOf("</html>")+7;
+            let html = text.substring(0, end);
+            return html;
+        }
+    </script>
+</body>
+</html>
+
+~domCreate.html
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+</head>
+<body>
+<div id="divNames"></div>
+<div id="lblName"></div>
+<script>
+    let names = ['Mike', 'Laichee', 'Jonathan', 'Christopher', 'Sean', 'Sasha', 'Kimberly', 'Lorenzo'];
+
+    let ol = document.createElement("ol");
+    let divNames = document.getElementById('divNames');
+    let lblName = document.getElementById('lblName');
+
+    divNames.appendChild(ol);
+
+    for (let i = 0; i < names.length; i++) {
+        divNames.appendChild(ol);
+        let li = document.createElement("li");
+        let a = document.createElement("a");
+        a.href = "http://qa.somee.com/details.aspx?name=" + names[i];
+        a.appendChild(document.createTextNode(names[i]));
+        li.appendChild(a);
+        ol.appendChild(li);
+        li.addEventListener('mousemove', (e) => {
+            lblName.innerHTML = e.target.href;
+        });
+    }
+</script>
+</body>
+</html>
+
+~dynamicDOM.html
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+</head>
+<body>
+<ol id="students"></ol>
+<script>
+    let ol = document.getElementById('students');
+
+    let names = ['Mike', 'Bob', 'Linda'];
+
+    names.forEach(name => {
+        let li = document.createElement('li');
+        li.innerHTML = name;
+        ol.appendChild(li);
+    });
+</script>
+
+</body>
+</html>
+
+~enhancingLook.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .shadow {
+            text-shadow: 4px 3px 3px gray; /* left, top, opacity */
+            text-decoration: none;
+        }
+        h3 {
+            border: 1px solid lightgrey;
+            box-shadow: 5px 10px 5px grey;
+            padding:2em;
+            width: 30em;
+        }
+        .curved{
+            border-radius:30px;
+        }
+
+        .info {
+            column-count: 3;
+            column-width: 100px;
+            column-rule: 2px solid black;
+            column-gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h2 class="shadow">Styled as text-shadow: 4px 3px 3px gray;</h2>
+    <h3>Styled as box-shadow: 5px 10px 5px grey;</h3>
+    <h3 class="curved">As above but with curved borders</h3>
+    <div class="info">
+        What are the principles?
+        Article 5 of the UK GDPR sets out seven key principles which lie at the heart of the general data protection regime.
+        <h5>Article 5(1) requires that personal data shall be:</h5>
+        (a) processed lawfully, fairly and in a transparent manner in relation to individuals (‘lawfulness, fairness and transparency’);
+        (b) collected for specified, explicit and legitimate purposes and not further processed in a manner that is incompatible with those purposes; further processing for archiving purposes in the public interest, scientific or historical research purposes or statistical purposes shall not be considered to be incompatible with the initial purposes (‘purpose limitation’);
+        (c) adequate, relevant and limited to what is necessary in relation to the purposes for which they are processed (‘data minimisation’);
+        (d) accurate and, where necessary, kept up to date; every reasonable step must be taken to ensure that personal data that are inaccurate, having regard to the purposes for which they are processed, are erased or rectified without delay (‘accuracy’);
+        (e) kept in a form which permits identification of data subjects for no longer than is necessary for the purposes for which the personal data are processed; personal data may be stored for longer periods insofar as the personal data will be processed solely for archiving purposes in the public interest, scientific or historical research purposes or statistical purposes subject to implementation of the appropriate technical and organisational measures required by the GDPR in order to safeguard the rights and freedoms of individuals (‘storage limitation’);
+        (f) processed in a manner that ensures appropriate security of the personal data, including protection against unauthorised or unlawful processing and against accidental loss, destruction or damage, using appropriate technical or organisational measures (‘integrity and confidentiality’).”
+    </div>
+</body>
+</html>
+
+~fetch.html
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+</head>
+<body>
+    <mark>Loading...</mark>
+    <script>
+        fetch('https://wsnorthwind.herokuapp.com/customers')
+            .then(res => {
+                return res.json();
+            }).then(data => {
+                display(data);
+            });
+
+        function display(data) {
+            data.forEach(cus => {
+                document.write(`<div>${cus.CustomerID}, ${cus.ContactName}, ${cus.City}</div>`)
+            });
+        }
+    </script>
+</body>
+</html>
+
+~fileAPI.html
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        function showFile() {
+            var fileUpload = document.getElementById("my-file");
+            // choose file from user's drive
+            var blob = fileUpload.files[0]; // Type = File
+
+            var reader = new FileReader();
+            reader.readAsText(blob, "UTF-8"); // asynchronous
+            reader.onload = function () {
+                alert(reader.result);
+            };
+        }
+    </script>
+</head>
+<body>
+    <h1>Files demo</h1>
+    <input id="my-file" type='file' accept='text/text'>
+    <button onclick="showFile()">Show file contents</button>
+    <div id="content"></div>
+</body>
+</html>
+
+~flex.html
+
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        p {
+            background-color: antiquewhite;
+            font-size: 24px;
+        }
+
+        div > div {
+            background-color: #f1f1f1;
+            width: 100px;
+            margin: 10px;
+            text-align: center;
+            line-height: 75px;
+            font-size: 30px;
+        }
+
+        .flex-container-wrap {
+            background-color: DodgerBlue;
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .flex-container-nowrap {
+            display: flex;
+            flex-wrap: nowrap;
+            background-color: DodgerBlue;
+        }
+
+        .flex-container-justifyCenter {
+            background-color: DodgerBlue;
+            display: flex;
+            flex-flow: row;
+            justify-content: center;
+        }
+
+        .flex-container-start {
+            display: flex;
+            justify-content: flex-start;
+            flex-flow: row;
+            background-color: DodgerBlue;
+        }
+
+        .flex-container-end {
+            display: flex;
+            justify-content: flex-end;
+            flex-flow: row;
+            background-color: DodgerBlue;
+        }
+
+        .flex-container-space {
+            display: flex;
+            justify-content: space-around;
+            flex-flow: row;
+            background-color: DodgerBlue;
+        }
+
+        .flex-container-spacebetween {
+            display: flex;
+            justify-content: space-between;
+            flex-flow: row;
+            background-color: DodgerBlue;
+        }
+
+        .flex-container-stretch {
+            display: flex;
+            align-items: stretch;
+            flex-flow: row;
+            background-color: DodgerBlue;
+        }
+
+        .flex-container-perfectCenter {
+            background-color: lightgray;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .reverseDirection {
+            flex-direction: row-reverse;
+        }
+
+        button {
+            height: 50px;
+            width: 200px;
+            border-radius: 10px;
+            box-shadow: gray 5px 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>The flex-wrap Property</h1>
+
+    <p>flex-wrap: wrap</p>
+    <div class="flex-container-wrap" top="true">
+        <div>1</div>
+        <div>2</div>
+        <div>3</div>
+        <div>4</div>
+        <div>5</div>
+        <div>6</div>
+        <div>7</div>
+        <div>8</div>
+        <div>9</div>
+        <div>10</div>
+        <div>11</div>
+        <div>12</div>
+    </div>
+    <p>flex-wrap: nowrap</p>
+    <div class="flex-container-nowrap" top="true">
+        <div>1</div>
+        <div>2</div>
+        <div>3</div>
+        <div>4</div>
+        <div>5</div>
+        <div>6</div>
+        <div>7</div>
+        <div>8</div>
+        <div>9</div>
+        <div>10</div>
+        <div>11</div>
+        <div>12</div>
+    </div>
+    <p>justify Center</p>
+    <div class="flex-container-justifyCenter" top="true">
+        <div>1</div>
+        <div>2</div>
+        <div>3</div>
+    </div>
+    <p>perfectCenter</p>
+    <div class="flex-container-perfectCenter" style="height:300px; width:50%" top="true">
+        <img src="QA_logo_blue.png" />
+    </div>
+    <p>justify start</p>
+    <div class="flex-container-start" top="true">
+        <div>1</div>
+        <div>2</div>
+        <div>3</div>
+    </div>
+    <p>justify end</p>
+    <div class="flex-container-end" top="true">
+        <div>1</div>
+        <div>2</div>
+        <div>3</div>
+    </div>
+    <p>space</p>
+    <div class="flex-container-space" top="true">
+        <div>1</div>
+        <div>2</div>
+        <div>3</div>
+    </div>
+    <p>space between</p>
+    <div class="flex-container-spacebetween" top="true">
+        <div>1</div>
+        <div>2</div>
+        <div>3</div>
+    </div>
+    <p>flex grow</p>
+    <div class="flex-container-wrap" top="true">
+        <div style="flex-grow: 1">1</div>
+        <div style="flex-grow: 1">2</div>
+        <div style="flex-grow: 8">3</div>
+    </div>
+    <p>flex shrink</p>
+    <div class="flex-container-nowrap" style="width:50%" top="true">
+        <div>1</div>
+        <div>2</div>
+        <div style="flex-shrink: 0">3</div>
+        <div>4</div>
+        <div>5</div>
+        <div>6</div>
+        <div>7</div>
+        <div>8</div>
+        <div>9</div>
+        <div>10</div>
+    </div>
+    <p>Make the third item not growable (0), not shrinkable (0), initial length=200px</p>
+
+    <div class="flex-container-nowrap" top="true">
+        <div>1</div>
+        <div>2</div>
+        <div style="flex: 0 0 200px">3</div>
+        <div>4</div>
+    </div>
+    <button onclick="reverse()">Reverse direction!</button>
+    <script>
+        function reverse() {
+            var items = document.querySelectorAll("[top='true']");
+            console.log(items.length);
+            for (var i = 0; i < items.length; i++) {
+                items[i].classList.add('reverseDirection');
+            }
+        }
+    </script>
+</body>
+</html>
+
+~form.html
+
+<!DOCTYPE html>
+<html>
+<head>
+    <script>
+        function serve(frm) {
+            if (frm.drink[2].checked &&
+                (frm.chkMilk.checked || frm.chkSugar.checked)) {
+                    alert("Can't have milk or sugar with soup!");
+                    return false;
+            }
+        }
+    </script>
+
+</head>
+<body>
+    <h3>QA drink service</h3>
+    <form method="get" action="queryString.html" onsubmit="return serve(this)">
+        <div>
+            <input type="radio" name="drink" value="t" checked />Tea
+            <input type="radio" name="drink" value="c" />Coffee
+            <input type="radio" name="drink" value="s" />Soup
+        </div>
+        <div>
+            <input type="checkbox" name="milk" value="y" />Milk
+            <input type="checkbox" name="sugar" value="y" />Sugar
+        </div>
+        <input type="submit" value="Vend" />
+    </form>
+</body>
+</html>
+
+~format.html
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>QA</title>
+</head>
+<body>
+
+    <p>Hello <b>Fred <i>Bloggs</i></b>, how are you?</p>
+
+    <p>Hello <b>Fred <i>Bloggs</b></i>, how are you?</div>
+
+    <p>Hello <b>Fred <i>Bloggs</i></b>, how are you?</div>
+
+</body>
+</html>
+
+~geoLocation.html
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition);
+            } else {
+                log("Geolocation is not supported by this browser.");
+            }
+        }
+        function watchMyLocation() {
+            var geo = navigator.geolocation;
+            watchNumber = geo.watchPosition(onSuccess, onError);
+        }
+        function stopWatching() {
+            var geo = navigator.geolocation;
+            geo.clearWatch(watchNumber);
+        }
+        function showPosition(position) {
+            log("Latitude: " + position.coords.latitude +
+                "<br /> Longitude: " + position.coords.longitude);
+            showMap(position);
+        }
+        function log(msg) {
+            document.getElementById("x").innerHTML = msg;
+        }
+        function showMap(position) {
+            var latlon = position.coords.latitude + "," + position.coords.longitude;
+
+            //var img_url = "https://maps.googleapis.com/maps/api/staticmap?center=" +
+            //    latlon + " & zoom=14 & size=400x300 & sensor=false & key=YOUR_KEY";
+
+            //document.getElementById("myMap").innerHTML = "<img src='" + img_url + "'>";
+        }
+        function watchMyLocation() {
+            var geo = navigator.geolocation;
+            watchNumber = geo.watchPosition(showPosition);
+        }
+        function stopWatching() {
+            var geo = navigator.geolocation;
+            geo.clearWatch(watchNumber);
+        }
+    </script>
+</head>
+<body>
+    <div id="x"></div>
+    <div id="myMap"></div>
+    <button onclick="getLocation()">get your coordinates</button>
+</body>
+</html>
+
+~HTML5_morelists.html
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+</head>
+<body>
+
+    <h3>Description list</h3>
+    <dl>
+        <dt>Programming Courses</dt>
+        <dd>Java SE programming II</dd>
+        <dd>C# development</dd>
+        <dt>Web Development Fundamentals</dt>
+        <dd>Level 3 web application</dd>
+        <dd>Responsive web application</dd>
+    </dl>
+    <h3>Data list</h3>
+    <input type="text" list="foodOptions" />
+    <datalist id="foodOptions">
+        <option value="Meat">
+        <option value="Vegetarian">
+        <option value="Semi-vegetarian">
+        <option value="Low-carbohydrate diet">
+    </datalist>
+
+    <h3>Details summary</h3>
+    <details>
+        <summary>details tag</summary>
+        <ol>
+            <li>Audio and video</a></li>
+            <li>Camera</li>
+            <li>Files</a></li>
+            <li>Geolocation</li>
+        </ol>
+    </details>
+
+</body>
+</html>
+
+~imdb.html
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>QA</title>
+    <style>
+        li:hover{
+            background-color:lightcyan;
+        }
+        img{
+            height:250px;
+        }
+        #films {
+            float: left;
+        }
+    </style>
+</head>
+<body>
+    <ol id="films"></ol>
+    <mark id="filmYear"></mark><img id="poster" />
+    <div style="clear:left">
+        film name:<input type="text" id="filmName" />
+        <button onclick="showFilmsList()">Show films</button>
+    </div>
+
+    <script>
+
+        let poster = document.getElementById('poster');
+        let filmYear = document.getElementById('filmYear');
+
+        function showFilmsList() {
+            poster.src = "";
+            filmYear.innerHTML = "";
+
+            let name = document.getElementById('filmName').value;
+            fetch("http://www.omdbapi.com/?apikey=ef5e4257&s=" + name)
+                .then(res => {
+                    return res.json();
+                }).then(data => {
+                    display(data)
+                });
+        }
+
+        function display(data) {
+            let ul = document.getElementById('films');
+            ul.innerHTML = "";
+            data.Search.forEach(film => {
+                let li = document.createElement('li');
+                li.appendChild(document.createTextNode("Title: " + film.Title));
+                li.addEventListener('mousemove', () => showPoster(film));
+                li.addEventListener('click', () => showInfo(film));
+                ul.appendChild(li);
+            });
+        }
+
+        function showPoster(film) {
+            poster.src = film.Poster;
+            filmYear.innerHTML = film.Year;
+        }
+
+        function showInfo(film) {
+            fetch("http://www.omdbapi.com/?apikey=ef5e4257&t=" + film.Title)
+                .then(res => {
+                    return res.json();
+                }).then(data => {
+                    alert('Actors:' + data.Actors + "\nDirector:" + data.Director);
+                });
+        }
+    </script>
+
+</body>
+</html>
+
+~inlineBlock.html
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        img {
+            width: 150px;
+            float: left;
+        }
+
+        span {
+            border: 2px solid red;
+        }
+        #divCss{
+            clear:both;
+        }
+    </style>
+    <script>
+        function display(style) {
+            let ctls = document.getElementsByTagName('span');
+            var css = {
+                width: '50px',
+                height: '50px',
+                padding: '5px',
+                border: '2px dashed red'
+            };
+            css.display = style;
+            Object.assign(ctls[0].style, css);
+            Object.assign(ctls[1].style, css);
+            displayCss(css);
+        }
+        function displayCss(css) {
+            css = JSON.stringify(css).replaceAll(',', ',<br />&nbsp;&nbsp;&nbsp;').replace('{', '{<br />&nbsp;&nbsp;&nbsp;').replace('}', '<br />}');
+            document.getElementById("divCss").innerHTML = css;
+        }
+    </script>
+</head>
+<body>
+    <div>This a div with a couple of spans <span>span a</span> <span>span b</span>. Spans are inline elements</div>
+    <p>
+        <button onclick="display('inline-block')">Make spans into inline_block</button>
+        <button onclick="display('block')">Make spans into block elements</button>
+    </p>
+    <h1>Float demo</h1>
+    <img src="team.jpg">
+    <p>
+        <strong>
+            This paragraph text should be at the side of the image, then wrap underneath it
+            when it gets that far
+        </strong>
+    </p>
+    <div id="divCss"></div>
+</body>
+</html>
+
+~inputtingData.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        div {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Inputs demo</h1>
+    <form action="index.html">
+        <div>
+            Number within min/max:
+            <input type="number" placeholder="Score" min="1" max="100" required>
+        </div>
+        <div>
+            RegEx, autocomplete=false, no spellcheck:
+            <input type="text" required spellcheck="false"
+                   pattern="[A-Z]{2}[0-9]{1,2}\s[0-9][A-Z]{2}"
+                   placeholder="Enter postcode"
+                   autocomplete="off">
+        </div><div>
+            pattern: letters only:<input type="text" pattern="[A-Za-z\s]+" />
+            <a href="https://www.w3schools.com/tags/tryit.asp?filename=tryhtml5_input_placeholder">see also</a>
+        </div>
+        <div>
+            10 max number of characters:
+            <input type="text" maxlength="10" placeholder="Max 10 chars...">
+        </div>
+        <div>
+            email:
+            <input type="email" placeholder="Multiple emails...">
+        </div>
+        <div>
+            Date input:
+            <input type="date" required>
+        </div>
+        <div>
+        <input type="range" value="24" min="1" max="100" oninput="this.nextElementSibling.value = this.value">
+        <output>24</output>
+        </div>
+        <input type="submit" value="Submit">
+    </form>
+</body>
+</html>
+
+~jQuery.html
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="utf-8" />
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <style>
+
+        .bordered {
+            float: left;
+            border: 1px solid red;
+            width: 2em;
+            text-align: center;
+        }
+
+        .turn {
+            background-color: black;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>Multiplication table</h1>
+
+    <div id="multi"></div>
+
+    <script>
+        $(function () {
+            showTable();
+        });
+
+        function showTable() {
+            for (var i = 1; i < 11; i++) {
+                for (var j = 1; j < 11; j++) {
+                    let cell = $(`<div> ${i * j} </div>`);
+                    cell.addClass('bordered');
+                    cell.appendTo($('#multi'));
+
+                    // cell.mousemove(function () { });
+                    cell.mouseenter(function () {
+                        $(this).toggleClass("turn");
+                    });
+                }
+                $(`<div style='clear:both'></div>`).appendTo($('#multi'));
+            }
+        }
+    </script>
+</body>
+</html>
+
+~json.html
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+</head>
+<body>
+<script>
+    let dataText = `
+    {
+        "menu": {
+        "id": "file",
+        "value": "File",
+        "popup": {
+            "menuitem": [
+            { "value": "New",   "onclick": "CreateNewDoc()" },
+            { "value": "Open",  "onclick": "OpenDoc()"      },
+            { "value": "Close", "onclick": "CloseDoc()"     }
+            ]
+        }
+        }
+    }`;
+    let data = JSON.parse(dataText);
+
+    document.write(data.menu.value);  // prints File
+    document.write("<br />");  
+    document.write(data.menu.popup.menuitem[1].value);  // prints Open
+</script>
+</body>
+</html>
+
+~keyFrames.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        p {
+            font-size: 14px;
+        }
+
+        @keyframes effect1 {
+            from {
+                font-size: 14px;
+            }
+
+            to {
+                font-size: 36px;
+                color: red;
+            }
+        }
+
+        p:hover {
+            animation-name: effect1;
+            animation-duration: 0.5s;
+            animation-fill-mode: forwards;
+        }
+
+        p.animated {
+            animation-name: effect1;
+            animation-duration: 1s;
+            animation-fill-mode: forwards;
+        }
+    </style>
+    <script>
+        function go() {
+            let x = document.getElementById("x");
+            x.className = !x.className ? "animated" : "";
+        }
+    </script>
+</head>
+<body>
+    <h1>Animation demo</h1>
+    <p id="x">This paragraph animates when you hover over it...</p>
+    <button onclick="go()">Click me</button>
+</body>
+</html>
+
+~lists.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>ListBoxes</h1>
+    <select>
+        <option>Option 1</option>
+        <option>Option 1</option>
+        <option>Option 3</option>
+    </select>
+    <select size="3">
+        <option>Option 1</option>
+        <option>Option 1</option>
+        <option>Option 3</option>
+        <option>Option 4</option>
+    </select>
+
+    <h2>Numbered list</h2>
+    <ol>
+        <li>Item</li>
+        <li>Item</li>
+        <li>Item</li>
+    </ol>
+
+    <h2>Bullet list</h2>
+    <ul>
+        <li>Item</li>
+        <li>Item</li>
+        <li>Item</li>
+    </ul>
+
+    <h2>Lettered list</h2>
+    <ol type="a">
+        <li>Item</li>
+        <li>Item</li>
+        <li>Item</li>
+    </ol>
+
+    <h2>Roman numeral list</h2>
+    <ol type="i">
+        <li>Item</li>
+        <li>Item</li>
+        <li>Item</li>
+        <li>Item</li>
+        <li>Item</li>
+    </ol>
+</body>
+</html>
+
+~measurment.html
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <style>
+        p {  border: 2px solid red; }
+
+        div {
+            float: left;
+            padding: 10px;
+            border: 2px solid blue;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" style="height:90vh;width: 30%">
+        <p style="width:50px">50px</p>
+        <p style="width:10em">10em</p>
+        <p style="width:20mm">20mm</p>
+        <p style="width:40mm">40mm</p>
+        <p style="width:4cm">4cm</p>
+        <p style="width:8cm">8cm</p>
+        height:90vh
+    </div>
+    <div style="height:80vh">height:80vh</div>
+    <div style="height:70vh">height:70vh</div>
+    <div style="height:60vh">height:60vh</div>
+    <div style="height:50vh">height:50vh</div>
+</body>
+</html>
+
+~mediaScreen.html
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>QA</title>
+    <style>
+        body {
+            background-color: White;
+        }
+
+        @media screen and (max-width:1000px) {
+            body {
+                background-color: lightsteelblue;
+            }
+
+            h1 {
+                font-size: 20pt;
+            }
+        }
+
+        @media screen and (max-width:800px) {
+            body {
+                background-color: lightgreen;
+            }
+
+            h1 {
+                font-size: 15pt;
+            }
+        }
+
+        @media screen and (max-width:300px) {
+            body {
+                background-color: lightgrey;
+            }
+
+            h1 {
+                font-size: 10pt;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Resize the width. Background colour and font size will change </h1>
+    <br />
+    <hr />
+    <textarea readonly rows="30" cols="70">
+    <style>
+        body {
+            background-color: White;
+        }
+
+        @media screen and (max-width:1000px) {
+            body {
+                background-color: lightsteelblue;
+            }
+
+            h1 {
+                font-size: 20pt;
+            }
+        }
+
+        @media screen and (max-width:800px) {
+            body {
+                background-color: lightgreen;
+            }
+
+            h1 {
+                font-size: 15pt;
+            }
+        }
+
+        @media screen and (max-width:300px) {
+            body {
+                background-color: lightgrey;
+            }
+
+            h1 {
+                font-size: 10pt;
+            }
+        }
+</style>
+    </textarea>
+</body>
+</html>
+
+~menus_bullets.html
+
+<html>
+<head>
+    <title>QA</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <style>
+        #menu1 {
+            list-style-type: square;
+        }
+
+        #menu2 {
+            list-style-type: none;
+        }
+
+        #menu3 {
+            list-style-image: url('arrow.gif');
+            margin-left: 2em;
+        }
+        /* menues and tabs*/
+        header li, nav li {
+            background: #FFF;
+            list-style: none;
+            padding-left: 1em;
+            padding-right: 1em;
+        }
+
+        li:hover {
+            background-color: #cccccc;
+        }
+
+        header li {
+            border: 1px solid lightgrey;
+            border-top-left-radius: 6px;
+            border-top-right-radius: 6px;
+            float: left;
+            box-shadow: -2px 2px 0 darkgrey;
+        }
+
+        nav {
+            width: 10%;
+            clear: left;
+        }
+
+        header {
+            margin-left: 90px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <ul>
+            <li>Home</li>
+            <li>Sales</li>
+            <li>Courses</li>
+            <li>About QA</li>
+            <li>Help</li>
+        </ul>
+    </header>
+
+    <nav>
+        <ul>
+            <li>File</li>
+            <li>Edit</li>
+            <li>View</li>
+            <li>Project</li>
+        </ul>
+    </nav>
+
+    <ul>
+        <li>Normal</li>
+        <li>Sell</li>
+        <li>Cart</li>
+        <li>Checkout</li>
+        <li>Help</li>
+    </ul>
+    <ul id="menu1">
+        <li>Square</li>
+        <li>Sell</li>
+        <li>Cart</li>
+        <li>Checkout</li>
+        <li>Help</li>
+    </ul>
+    <ul id="menu2">
+        <li>No bullets</li>
+        <li>Sell</li>
+        <li>Cart</li>
+        <li>Checkout</li>
+        <li>Help</li>
+    </ul>
+    <ul id="menu3">
+        <li>With image bullets</li>
+        <li>Sell</li>
+        <li>Cart</li>
+        <li>Checkout</li>
+        <li>Help</li>
+    </ul>
+</body>
+</html>
+
+~moreTags.html
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+</head>
+<body>
+    <p>Water is: H<sub>2</sub>O</p>
+    <p>if x is 5 then x<sup>2</sup> = 25</p>
+    <p><abbr title="Hyper Text Markup Language">HTML</abbr></p>
+    <blockquote>
+        Example of blockquote<br />
+        Another line inside blockquote
+    </blockquote>
+    <div>text outside of blockquote</div>
+    <p>Example of the del tag: <del>delete this</del>text</p>
+    <p>Example of the ins tag: <ins>insert this</ins> text</p>
+    <p>Example of the mark tag: Mark my <mark>word</mark>!</p>
+<pre>
+pre tag: These lines
+    Will display
+        as written
+            preserving spaces, tabs
+                and line breaks
+<div>This is a div tag inside a pre tag.</div>
+        It does what div tags do!
+
+</body>
+</html>
+
+~outputElement.html
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>QA</title>
+</head>
+<body>
+
+    <form oninput="x.value=parseInt(a.value)">
+        <input type="range" id="a">
+        =<output name="x"></output>
+    </form>
+
+    <hr />
+
+    <form oninput="x.value=parseInt(a.value)+parseInt(b.value)">
+        <input type="range" id="a">
+        <span>+</span>
+        <input type="number" id="b" value="25">
+        =<output name="x"></output>
+    </form>
+
+</body>
+</html>
+
+~overflow.html
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        div {
+            border: 1px solid black;
+            width: 100px;
+            height: 100px;
+            /* overflow: scroll; */
+            /*overflow: hidden;*/
+            /*overflow: visible;*/
+        }
+
+        #div2 {
+            background-color: lightblue;
+            color: brown;
+            margin-top: 35px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Overflow demo</h1>
+    <div id="div1">
+        This div contains lots of text, probably too much
+        to fit within it, so we can control what happens to
+        the bits that won't fit in...
+    </div>
+    <div id="div2">
+        This is div2. Text colour is brown.
+    </div>
+    <h3>Click on bullets to see effect</h3>
+    <ul>
+        <li onclick="overflow(1)">overflow: scroll</li>
+        <li onclick="overflow(2)">overflow: hidden</li>
+        <li onclick="overflow(3)">overflow: visible</li>
+    </ul>
+    <script>
+        function overflow(i) {
+            var div1 = document.getElementById('div1');
+
+            if (i == 1) {
+                div1.style.overflow = 'scroll';
+            }
+            else if (i == 2) {
+                div1.style.overflow = 'hidden';
+            }
+            else if (i == 3) {
+                div1.style.overflow = 'visible';
+            }
+        }
+    </script>
+</body>
+</html>
+
+~page0.html
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+
+    <script src="qaScript.js"></script>
+    <link href="qaStyle.css" rel="stylesheet" />
+<style>
+    h1,h2,h3,h4,h5,h6,span,p,div{
+        border:2px dashed blue;
+        width:30%;
+    }
+</style>
+</head>
+<body>
+    <h1>Heading 1</h1>
+    <h2>Heading 2</h2>
+    <h3>Heading 3</h3>
+    <h4>Heading 4</h4>
+    <h5>Heading 5</h5>
+    <h6>Heading 6</h6>
+
+    <span>span1</span>
+    <span>span2</span>
+    <span>span3</span>
+    <br />
+    <div>div1</div>
+    <div>div2</div>
+    <hr />
+    <p>Paragrap1</p>
+    <p>Paragrap2</p>
+
+
+    <!--<ol id="students"></ol>
+
+    <script>
+        let myStudents = document.getElementById('students');
+
+        let names = ['Mike', 'Bob', 'Linda'];
+
+        names.forEach(name => {
+            let listItem = document.createElement('li');
+            listItem.innerHTML = name;
+            myStudents.appendChild(listItem);
+        });
+    </script>-->
+</body>
+</html>
+
+~page1.html
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <style>
+    </style>
+</head>
+<body>
+    <div>Normal text</div>
+    <div>
+        <small>Small text</small>
+    </div>
+    <div>
+        <strong>Strong text</strong>
+    </div>
+    <hr />
+    <div><b>Bold</b></div>
+    <div><i>Italic</i></div>
+    <div><u>Underline</u></div>
+
+    <hr />
+    <div>
+        H<sub>2</sub>O
+    </div>
+    <div>
+        5<sup>2</sup>=25
+    </div>
+    <hr />
+
+    <div><del>Deleted text</del></div>
+    <div><ins>Inserted text</ins></div>
+    <div><mark>Marked text</mark></div>
+
+</body>
+</html>
+
+~page2.html
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+</head>
+<body>
+    <p>Hover mouse over the word 
+    <abbr title="Hyper Text Markup Language">HTML</abbr></p>
+    <hr />
+    <blockquote>
+        Example of blockquote<br />
+        Another line inside blockquote
+    </blockquote>
+    <div>text outside of blockquote</div>
+    <hr />
+<pre>
+pre tag: These lines
+    Will display
+        as written
+            preserving spaces, tabs
+                and line breaks
+</body>
+</html>
+
+~page3.html
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+    <h3>Example of get method</h3>
+    <form method="get" action="serve.aspx">
+        <div>
+            <input type="radio" name="drink" value="t" checked />Tea
+            <input type="radio" name="drink" value="c" />Coffee
+            <input type="radio" name="drink" value="s" />Soup
+        </div>
+        <div>
+            <input type="checkbox" name="milk" value="y" />Milk
+            <input type="checkbox" name="sugar" value="y" />Sugar
+        </div>
+        <input type="submit" value="Vend" />
+    </form>
+
+    <h3>Example of post method</h3>
+    <form method="post" action="serve.aspx">
+        <div>
+            <input type="radio" name="drink" value="t" checked />Tea
+            <input type="radio" name="drink" value="c" />Coffee
+            <input type="radio" name="drink" value="s" />Soup
+        </div>
+        <div>
+            <input type="checkbox" name="milk" value="y" />Milk
+            <input type="checkbox" name="sugar" value="y" />Sugar
+        </div>
+        <input type="submit" value="Vend" />
+    </form>
+</body>
+</html>
+
+~positionDemo.html
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <style>
+        div {
+            border: 1px solid black;
+            background-color: antiquewhite;
+            width: 250px;
+            height: 100px;
+        }
+
+        #div1 {
+            width: 50px;
+            height: 30px;
+            background-color: lightblue;
+        }
+
+        .container {
+            float: left;
+        }
+
+        button {
+            margin-left: 3em;
+            margin-top: 1px;
+        }
+    </style>
+
+    <script>
+        function position(style) {
+            let ctl = document.getElementById("div1");
+            var css = {
+                top: '20px',
+                left: '150px'
+            };
+            css.position =  style;
+            Object.assign(ctl.style, css);
+            displayCss(css);
+        }
+        function displayCss(css) {
+            css = JSON.stringify(css).replaceAll(',', ',<br />&nbsp;&nbsp;&nbsp;').replace('{', '{<br />&nbsp;&nbsp;&nbsp;').replace('}', '<br />}');
+            document.getElementById("divCss").innerHTML = css;
+        }
+    </script>
+</head>
+<body>
+    <div id="divCss"></div>
+    <div class="container">
+        <div id="div1">QA</div>
+    </div>
+    <div>
+        <button onclick="position('static')">static</button><br />
+        <button onclick="position('relative')">relative</button>
+        <button onclick="position('absolute')">absolute</button><br />
+        <button onclick="position('fixed')">fixed</button>
+        <button onclick="position('sticky')">sticky</button><br />
+    </div>
+    <div>a</div>
+    <div>b</div>
+    <div>c</div>
+    <div>d</div>
+    <div>e</div>
+    <div>f</div>
+</body>
+</html>
+
+~queryString.html
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+</head>
+<body>
+    <script>
+        const urlSearchParams = new URLSearchParams(window.location.search);
+        const params = Object.fromEntries(urlSearchParams.entries());
+
+        let drink = params['drink'];
+        let milk = (params['sugar'] === undefined) ? 'no sugar' : 'sugar';
+        let sugar = (params['milk'] === undefined) ? 'no milk' : 'milk';
+
+
+        alert(`drink ${drink} \nwith ${sugar} \nwith ${milk}`);
+    </script>
+</body>
+</html>
+
+~region.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="css-region-polyfill.js"></script>
+    <style>
+        #content {
+            flow-into: myContent;
+        }
+
+        #region1, #region2, #region3 {
+            flow-from: myContent;
+            wrap-through: wrap;
+        }
+
+        #region1 {
+            color: green;
+        }
+
+        #region2 {
+            color: red;
+        }
+
+        #region3 {
+            color: blue;
+            overflow: auto
+        }
+
+        div {
+            width: 250px;
+            height: 80px;
+            margin-bottom: 5px;
+            padding: 2px;
+            background-color: lightgray;
+        }
+    </style>
+</head>
+<body>
+
+    <a href="https://www.w3.org/TR/css-regions-1/">For example diagrams, see</a>
+    <hr />
+    <div id="content">
+        The actual text goes here... this is quite a lot of text it will
+        probably overflow the initial region where we place it...
+        The CSS Regions module allows content from one or more elements to flow through one or more boxes called CSS Regions, fragmented as defined in [CSS3-BREAK]. This module also defines CSSOM to expose both the inputs and outputs of this fragmentation.
+        CSS is a language for describing the rendering of structured documents (such as HTML and XML) on screen, on paper, in speech, etc.
+    </div>
+    <div id="region1">
+    </div>
+    <div>
+        No text will flow here! Not included in any region.
+    </div>
+    <div id="region2"> </div>
+    <div>
+        No text will flow here either! Not included in any region.
+    </div>
+    <div id="region3"></div>
+</body>
+</html>
+
+~rotaionTransition.html
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <style>
+        .transformers {
+            transform: rotate(10deg) translate(100px, 0);
+            transform-origin: 0 0;
+            width: 50%;
+            border: 1px solid brown;
+        }
+
+        div:hover {
+            transition: background-color 5s, color 5s;
+            background-color: black;
+            color: white;
+        }
+
+        .skewItX {
+            transform: skewX(20deg);
+        }
+
+            .skewItX:hover {
+                transition: transform 2s;
+                transform: skewX(0deg);
+            }
+
+        .skewItY {
+            transform: skewY(20deg);
+        }
+
+        .skewItY, .skewItX {
+            border: 1px solid brown;
+            width: 200px;
+            height: 150px;
+            background-color: lightblue;
+            font-size: 24px;
+        }
+    </style>
+
+</head>
+<body>
+    <h3>Hover your mouse over the rotated area and wait for a few seconds</h3>
+    <div class="transformers">
+        Physics (from Greek word for "nature") is a branch of science that developed out of philosophy, and was thus referred to as natural philosophy until the late 19th century
+        <img src="QA_logo_blue.png" />
+        Elements of what became physics were drawn primarily from the fields of astronomy, optics, and mechanics
+    </div>
+    <div class="skewItY">QA Training SkewY(20deg)</div>
+    <div class="skewItX">Apprenticeship training SkewX(20deg)</div>
+</body>
+</html>
+
+~rotaionZdirection.html
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <style>
+        div {
+            background-color: #cccccc;
+            width: 30%;
+            padding: 0.5em;
+            margin: 5em;
+            transition: transform 5s;
+        }
+
+        .qa1:hover {
+            transform: rotateZ(360deg);
+        }
+
+        .qa2:hover {
+            transform: rotateX(180deg);
+        }
+    </style>
+</head>
+<body>
+    <h3>Hover your mouse over the greyed area and then move it away to see the annimation</h3>
+    <div class="qa1">
+        <h1>QA Training</h1>
+    </div>
+    <div class="qa2">        
+        <h1>QA Training</h1>
+    </div>
+</body>
+</html>
+
+~select.html
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        table, th, td {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <label for="courses">Choose a course:</label>
+
+    <select name="courses" id="courses">
+        <option value="ja">Java</option>
+        <option value="cs">C#</option>
+        <option value="wd">Web development</option>
+        <option value="se">Security</option>
+    </select>
+
+    <button onclick="showSelected()">What course index was selected?</button>
+<script>
+    function showSelected() {
+        let courses = document.getElementById('courses');
+        let index = courses.selectedIndex;
+        alert(`Index of ${index} was selected.\nText=${courses[index].text}\nvalue=${courses[index].value}`);
+    }
+</script>
+</body>
+</html>
+
+~selectionByAttibute.html
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <style>
+        
+        input[type=text]:disabled {
+            background-color: lightgray;
+        }
+
+        input[placeholder *= 'C'] {
+            border: 3px groove red;
+        }
+        [company=qa]{
+            background-color: blue;
+            color:white;
+            font-weight:bold;
+            font-size:x-large;
+            width:30%;
+            text-align:center;
+        }
+    </style>
+</head>
+<body>
+    <p company="qa">QA Training</p>
+    <p>This input has a placeholder of ABC: <input type="text" placeholder="ABC" />  </p>
+    <p>This input has a placeholder of AB:  <input disabled type="text" placeholder="AB" />  </p>
+    <a href="https://www.w3schools.com/cssref/css_selectors.asp">See also</a>
+</body>
+</html>
+
+~storage.html
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        function getLocalVar() {
+            alert(localStorage.name);
+        }
+        function getSessionVar() {
+            alert(sessionStorage.name);
+        }
+        function setSessionVar() {
+            sessionStorage.name = "Name in sessionStorage";
+        }
+        function setLocalVar() {
+            localStorage.name = "Name in localStorage";
+        }
+    </script>
+</head>
+<body>
+    <h1>Local and session storage</h1>
+    <p>
+        <button onClick="getSessionVar()">get SessionStorage var</button>
+        <button onClick="getLocalVar()">get LocalStorage var</button>
+    </p>
+    <p>
+        <button onClick="setSessionVar()">set SessionStorage var</button>
+        <button onClick="setLocalVar()">set LocalStorage var</button>
+    </p>
+    <a href="demo.html?page=storagePage2.html">Storage Go to page 2</a>
+</body>
+</html>
+
+~storagePage2.html
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        alert(localStorage.getItem("name"));
+        alert(sessionStorage.getItem("name"));
+    </script>
+</head>
+<body>
+    <h1>Local and session storage page 2</h1>
+</body>
+</html>
+
+~svgCode.html
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <script>
+        function updateModel(size) {
+            var circle = document.getElementById('red-circle');
+            circle.setAttributeNS(null, "r", size);
+        }
+    </script>
+</head>
+<body>
+    <h1>SVG JavaScript API demo</h1>
+
+    <!-- Define an inline SVG graphic -->
+    <svg width="250" height="200" id="mySGV">
+        <rect x="0" y="0" width="250" height="200" stroke="gray" stroke-width="25" fill="white" />
+        <circle cx="50" cy="50" r="40" stroke="blue" stroke-width="10" fill="cyan" />
+        <circle id="red-circle" cx="100" cy="100" r="25" stroke="red" stroke-width="10" fill="pink" />
+    </svg>
+
+    <br>
+    <br>
+    Size:<input type="range" id="radius" oninput="updateModel(this.value)" value="25"/>
+</body>
+</html>
+
+~svgCSSAnimation.html
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <style>
+        @keyframes animation1 {
+            from {
+                r: 25;
+                cx: 100;
+            }
+
+            to {
+                r: 5;
+                cx: 50;
+            }
+        }
+
+        @keyframes animation2 {
+            from {
+                transform: rotate(-5deg);
+            }
+
+            to {
+                transform: rotate(5deg);
+            }
+        }
+
+        #red-circle {
+            animation-name: animation1;
+            animation-duration: 2s;
+            animation-direction: alternate;
+            animation-iteration-count: infinite;
+            animation-timing-funciton: linear;
+        }
+
+        #grey-box {
+            animation-name: animation2;
+            animation-duration: 3s;
+            animation-direction: alternate;
+            animation-iteration-count: infinite;
+            transform-box: fill-box;
+            transform-origin: center;
+        }
+
+        #blue-circle:hover {
+            fill: yellow;
+        }
+        svg{
+            width:50%;
+        }
+    </style>
+</head>
+<body>
+    <h1>SVG CSS animations demo</h1>
+
+    <svg viewBox="-20 -20 190 140">
+        <rect id="grey-box" x="0" y="0" width="150" height="100" stroke="gray" stroke-width="25" fill="white" />
+        <circle id="blue-circle" cx="50" cy="50" r="40" stroke="blue" stroke-width="10" fill="cyan" />
+        <circle id="red-circle" cx="100" cy="50" r="25" stroke="red" stroke-width="10" fill="pink" />
+    </svg>
+</body>
+</html>
+
+~svgDemo.html
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <style>
+        rect:hover {
+            filter: url(#f2);
+        }
+    </style>
+</head>
+<body>
+    <h2>Scalable Vector Graphics</h2>
+    <svg height="100" width="100">
+        <defs>
+            <filter id="f1" x="0" y="0">
+                <feGaussianBlur in="SourceGraphic" stdDeviation="15" />
+            </filter>
+            <filter id="f2" x="0" y="0">
+                <feOffset result="offOut" in="SourceGraphic" dx="0" dy="0" />
+            </filter>
+        </defs>
+        <rect x="5" y="5" width="50" height="50" stroke="green" stroke-width="5" fill="yellow" filter="url(#f1)" />
+        <text x="8" y="25">Hover</text>
+
+        Your browser does not support inline SVG.
+    </svg>
+
+    <svg width="500" height="500">
+        <circle cx="50" cy="50" r="40" stroke="green"
+                stroke-width="4" fill="yellow" />
+        <rect x="50" y="50" width="100" height="50"
+              style="fill:rgb(0,0,255);stroke-width:3;stroke:rgb(0,0,0)" />
+
+        <rect x="60" y="60" rx="30" ry="30" width="150" height="150"
+              style="fill:red;stroke:black;stroke-width:5;opacity:0.5" />
+        <polygon points="80,10 200,10 200,165 80,10"
+                 style="fill:lime;stroke:purple;stroke-width:2;opacity:0.6" />
+        <polygon points="300,10 240,198 390,78 210,78 360,198"
+                 style="fill:lime;stroke:purple;stroke-width:5;fill-rule:evenodd;" />
+
+        <svg height="200" width="500">
+            <defs>
+                <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" style="stop-color:rgb(255,255,0);stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:rgb(255,0,0);stop-opacity:1" />
+                </linearGradient>
+            </defs>
+            <ellipse cx="400" cy="70" rx="85" ry="55" fill="url(#grad1)" />
+            <text fill="#ffffff" font-size="25" font-family="Verdana" x="380" y="86">QA</text>
+            Sorry, your browser does not support inline SVG.
+        </svg>
+    </svg>
+
+</body>
+</html>
+
+~svgFilter.html
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+</head>
+<body>
+    <svg viewBox="0 0 150 100">
+        <defs>
+            <filter id="blur" x="-20%" y="-20%" width="140%" height="150%">
+                <feGaussianBlur in="SourceGraphic" stdDeviation="3" />
+            </filter>
+        </defs>
+        <rect x="0" y="0" width="150" height="100" stroke="gray" stroke-width="25" fill="white" />
+        <circle cx="50" cy="50" r="40" stroke="blue" stroke-width="10" fill="cyan" />
+        <circle id="live" cx="100" cy="50" r="25" stroke="red" stroke-width="10" fill="pink" filter="url(#blur)" />
+    </svg>
+
+    <h3>Applying filter to HTML element</h3>
+    <img id="image1" src="team.jpg" style="filter: url(#blur);"/>
+</body>
+</html>
+
+~tableCaption.html
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        table, th, td {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <table>
+        <caption>Monthly calender</caption>
+        <tr>
+            <th>Month</th>
+            <th>Course</th>
+        </tr>
+        <tr>
+            <td>January</td>
+            <td>Java</td>
+        </tr>
+        <tr>
+            <td>February</td>
+            <td>Web development</td>
+        </tr>
+    </table>
+</body>
+</html>
+
+~tables.html
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="utf-8" />
+    <style>
+        .redBorder {
+            border: 1px solid red;
+        }
+
+        table {
+            border: 1px solid red;
+            width: 50%;
+        }
+
+        td {
+            border: 1px solid blue;
+        }
+
+        .silverBack {
+            background-color: silver;
+        }
+    </style>
+</head>
+<body>
+    <div id="customerData"></div>
+    <script>
+        var table = "<table><caption>Table example</caption>";
+        for (var row = 0; row < 5; row++) {
+            table += "<tr>";
+            for (var column = 0; column < 3; column++) {
+                table += "<td>" + row + "," + column + "</td>";
+            }
+            table += "</tr>";
+        }
+        table += "</table>"
+        document.getElementById("customerData").innerHTML = table;
+        console.log(table);
+    </script>
+    <h3>Advanced table demo</h3>
+
+    <table>
+        <caption>Sales</caption>
+        <colgroup span="2"
+                  style="background-color:lightcyan;"></colgroup>
+        <colgroup style="background-color:lightyellow;"></colgroup>
+
+        <thead>
+            <tr>
+                <th scope="col">Quarter</th>
+                <th scope="col">Total Sales</th>
+                <th scope="col">Goal Met?</th>
+            </tr>
+        </thead>
+        <tfoot>
+            <tr>
+                <th scope="col" colspan="2">Total</th>
+                <th scope="col">£18,118</th>
+            </tr>
+        </tfoot>
+        <tbody>
+            <tr>
+                <td>Q1</td>
+                <td>£4,349</td>
+                <td>Yes</td>
+            </tr>
+            <tr>
+                <td>Q2</td>
+                <td>£2,984</td>
+                <td>No</td>
+            </tr>
+            <tr>
+                <td>Q3</td>
+                <td>£3,570</td>
+                <td>Yes</td>
+            </tr>
+            <tr>
+                <td>Q4</td>
+                <td>£7,215</td>
+                <td>Yes</td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>
+
+~tabsInlineBlock.html
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>QA</title>
+    <meta name="description" content="HTML5 basic page">
+    <meta name="author" content="Mike">
+    <style>
+        li {
+            background: #FFF;
+            list-style: none;
+            padding-left: 1em;
+            padding-right: 1em;
+        }
+
+            li:hover {
+                background-color: #cccccc;
+            }
+
+        header li {
+            border: 1px solid lightgrey;
+            border-top-left-radius: 6px;
+            border-top-right-radius: 6px;
+            float: left;
+            box-shadow: -2px 2px 0 darkgrey;
+        }
+
+        nav {
+            width: 50%;
+            clear: left;
+        }
+
+        header {
+            margin-left: 90px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <ul>
+            <li>Home</li>
+            <li>Sales</li>
+            <li>Courses</li>
+            <li>About QA</li>
+            <li>Help</li>
+        </ul>
+    </header>
+
+    <nav>
+        <ul>
+            <li>File</li>
+            <li>Edit</li>
+            <li>View</li>
+            <li>Project</li>
+        </ul>
+    </nav>
+</body>
+</html>
+
+~tfl.html
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+</head>
+<body>
+    <ol id="tflLines"></ol>
+    <div id="info"></div>
+    <script>
+        let url = 'https://api.tfl.gov.uk/Line/Mode/tube/Status';
+        fetch(url)
+            .then(res => {
+                return res.json();
+            }).then(data => {
+                display(data)
+            });
+
+        function display(data) {
+            let ol = document.getElementById('tflLines');
+            data.forEach(line => {
+                let li = document.createElement('li');
+                li.appendChild(document.createTextNode(line.id));
+                li.addEventListener('mousemove', () => displayInfo(line));
+                ol.appendChild(li);
+            });
+        }
+        function displayInfo(line) {
+            let info = "Status: "
+            line.lineStatuses.forEach(status => {
+                info += status.statusSeverityDescription;
+            });
+            document.getElementById('info').innerHTML = info;
+        }
+    </script>
+</body>
+</html>
+
+~tflJq.html
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+
+</head>
+<body>
+    <ol id="tflLines"></ol>
+    <div id="info"></div>
+    <script>
+        let url = 'https://api.tfl.gov.uk/Line/Mode/tube/Status';
+
+        $.getJSON(url, (data) => display (data));
+
+        function display(data) {
+            let ol = $('#tflLines');
+            data.forEach(line => {
+                let li = $(`<li>${line.id}</li>`);
+                li.mousemove( ()=>displayInfo(line) );
+                li.appendTo(ol);
+            });
+        }
+        function displayInfo(line) {
+            let info = $('#info');
+            info.html('');
+            $(`<div><h3>Status of line ${line.id}<h3></div>`).appendTo(info);
+            line.lineStatuses.forEach(status => {
+                $(`<div>${status.statusSeverityDescription}</div>`).appendTo(info);
+            });
+        }
+    </script>
+</body>
+</html>
+
+~toggle.html
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script>
+        function validate() {
+            $("#qa").toggleClass("redBorder");
+        }
+    </script>
+    <style>
+        .redBorder {
+            border: 1px dashed red;
+        }
+    </style>
+</head>
+<body>
+    <div id="qa">QA Training Ltd.</div>
+    <button onclick="validate()">validate</button>
+</body>
+</html>
+
+~XMLHttpRequest.html
+
+<html>
+<head>
+    <script>
+        function getWeather() {
+            var http = new XMLHttpRequest();
+            http.onload = onLoad;
+            var city = document.getElementById("city").value;
+            var url = `https://weather-api.qaalabs.com/api/weather/${city}`;
+            http.open("GET", url);
+            http.send();
+        }
+
+        function onLoad(e) {
+            var http = e.target;
+            var result = document.getElementById("result");
+            if (http.status == 200) {
+                var json = formatJson(http.responseText);
+                var headers = http.getAllResponseHeaders();
+                result.firstChild.nodeValue = `${json}\n\n${headers}`;
+            } else {
+                result.firstChild.nodeValue = `${http.status} ${http.statusText}`;
+            }
+        }
+
+        function formatJson(json) {
+            var obj = JSON.parse(json);
+            return JSON.stringify(obj, null, 2);
+        }
+    </script>
+</head>
+<body>
+    <h1>XMLHttpRequest API demo</h1>
+    <input id="city" type="text" autocomplete="off" placeholder="City" value="Pudsey">
+    <button onclick="getWeather()">Get weather</button>
+    <pre id="result">Response will go here...</pre>
+</body>
+</html>
